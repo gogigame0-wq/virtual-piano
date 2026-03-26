@@ -1,1 +1,106 @@
-<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Virtual Piano</title>\n    <style>\n        body {\n            display: flex;\n            justify-content: center;\n            align-items: center;\n            height: 100vh;\n            background-color: #f0f0f0;\n        }\n        .piano {\n            display: flex;\n            position: relative;\n            width: 600px;\n            height: 200px;\n        }\n        .key {\n            flex: 1;\n            height: 100%;\n            border: 1px solid #000;\n            position: relative;\n            background-color: white;\n            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);\n        }\n        .key:active {\n            background-color: #ccc;\n        }\n        .key.black {\n            background: black;\n            width: 60%;\n            height: 80%;\n            position: absolute;\n            left: 75%;\n            margin-left: -30%;\n            z-index: 1;\n        }\n    </style>\n</head>\n<body>\n    <div class="piano">\n        <div class="key"></div>\n        <div class="key black"></div>\n        <div class="key"></div>\n        <div class="key black"></div>\n        <div class="key"></div>\n        <div class="key"></div>\n        <div class="key black"></div>\n        <div class="key"></div>\n        <div class="key black"></div>\n        <div class="key"></div>\n        <div class="key"></div>\n        <div class="key black"></div>\n        <div class="key"></div>\n    </div>\n    <button id="recordButton">Record</button>\n    <script>\n        let recording = false;\n        const recordButton = document.getElementById('recordButton');\n        let recordedNotes = [];\n        recordButton.addEventListener('click', () => {\n            recording = !recording;\n            if (recording) {\n                recordedNotes = []; // Clear previous recordings\n                recordButton.textContent = 'Stop Recording';\n            } else {\n                recordButton.textContent = 'Record';\n                console.log(recordedNotes); // Here you can add functionality to save the recorded notes.\n            }\n        });\n    </script>\n</body>\n</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Piano</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #232323;
+            color: white;
+            font-family: 'Arial', sans-serif;
+        }
+        #piano {
+            display: grid;
+            grid-template-columns: repeat(14, 1fr);
+            gap: 2px;
+        }
+        .key {
+            width: 50px;
+            height: 200px;
+            background-color: #fff;
+            border: 1px solid #000;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.1s;
+        }
+        .key:active {
+            background-color: #ddd;
+        }
+        .black-key {
+            position: absolute;
+            width: 30px;
+            height: 120px;
+            background-color: #000;
+            top: 0;
+            left: 35px;
+            z-index: 1;
+        }
+        #recording {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="piano"></div>
+    <button id="recording">Start Recording</button>
+    <script>
+        const pianoNotes = {
+            'C': new Audio('sounds/C.mp3'),
+            'D': new Audio('sounds/D.mp3'),
+            'E': new Audio('sounds/E.mp3'),
+            'F': new Audio('sounds/F.mp3'),
+            'G': new Audio('sounds/G.mp3'),
+            'A': new Audio('sounds/A.mp3'),
+            'B': new Audio('sounds/B.mp3'),
+            'C#': new Audio('sounds/C#.mp3'),
+            'D#': new Audio('sounds/D#.mp3'),
+            'F#': new Audio('sounds/F#.mp3'),
+            'G#': new Audio('sounds/G#.mp3'),
+            'A#': new Audio('sounds/A#.mp3')
+        };
+        const recordings = [];
+
+        function createKey(note) {
+            const key = document.createElement('div');
+            key.classList.add('key');
+            key.dataset.note = note;
+            key.innerText = note;
+            key.addEventListener('click', playNote);
+            document.getElementById('piano').appendChild(key);
+
+            // Create black keys
+displayBlackKey(note, key);
+        }
+
+        function displayBlackKey(note, key) {
+            const blackKeys = ['C#', 'D#', 'F#', 'G#', 'A#'];
+            if (blackKeys.includes(note)) {
+                const blackKey = document.createElement('div');
+                blackKey.classList.add('black-key');
+                key.appendChild(blackKey);
+            }
+        }
+
+        function playNote() {
+            const note = this.dataset.note;
+            pianoNotes[note].currentTime = 0;
+            pianoNotes[note].play();
+            if (recordings.length < 10) {
+                recordings.push(note);
+            }
+        }
+
+        document.getElementById('recording').addEventListener('click', function() {
+            alert('Recording started!');
+        });
+
+        ['C', 'D', 'E', 'F', 'G', 'A', 'B'].forEach(note => createKey(note));
+
+    </script>
+</body>
+</html>

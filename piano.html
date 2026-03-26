@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Piano</title>
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.7.77/build/Tone.js"></script>
+    <style>
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to right, #1c1c1c, #3a3a3a);
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .piano {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            width: 80vw;
+            height: 200px;
+            border: 1px solid #888;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+        .key {
+            flex: 1;
+            position: relative;
+            border: 1px solid #ccc;
+            transition: background 0.1s;
+        }
+        .white {
+            background: white;
+            height: 100%;
+            z-index: 2;
+        }
+        .black {
+            background: black;
+            height: 70%;
+            position: absolute;
+            width: 60%;
+            left: 70%;
+            margin-left: -30%;
+            z-index: 3;
+        }
+        .pressed {
+            background: yellow;
+        }
+        button {
+            position: absolute;
+            bottom: -40px;
+            right: 0;
+            padding: 10px;
+            background: #444;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="piano" id="piano">
+        <div class="key white" data-note="C4"></div>
+        <div class="key black" data-note="C#4"></div>
+        <div class="key white" data-note="D4"></div>
+        <div class="key black" data-note="D#4"></div>
+        <div class="key white" data-note="E4"></div>
+        <div class="key white" data-note="F4"></div>
+        <div class="key black" data-note="F#4"></div>
+        <div class="key white" data-note="G4"></div>
+        <div class="key black" data-note="G#4"></div>
+        <div class="key white" data-note="A4"></div>
+        <div class="key black" data-note="A#4"></div>
+        <div class="key white" data-note="B4"></div>
+        <div class="key white" data-note="C5"></div>
+    </div>
+    <button id="record">Record</button>
+    <script>
+        const piano = document.getElementById('piano');
+        const recordButton = document.getElementById('record');
+        let recording = false;
+        let notesPlayed = [];
+
+        piano.addEventListener('mousedown', (event) => {
+            if (event.target.classList.contains('key')) {
+                const note = event.target.dataset.note;
+                playSound(note);
+                event.target.classList.add('pressed');
+                if (recording) {
+                    notesPlayed.push(note);
+                }
+            }
+        });
+
+        piano.addEventListener('mouseup', (event) => {
+            if (event.target.classList.contains('key')) {
+                event.target.classList.remove('pressed');
+            }
+        });
+
+        recordButton.addEventListener('click', () => {
+            recording = !recording;
+            recordButton.textContent = recording ? 'Stop' : 'Record';
+            if (!recording) {
+                playback();
+                notesPlayed = [];
+            }
+        });
+
+        function playSound(note) {
+            const synth = new Tone.Synth().toDestination();
+            synth.triggerAttackRelease(note, '8n');
+        }
+
+        function playback() {
+            let index = 0;
+            const interval = setInterval(() => {
+                if (index < notesPlayed.length) {
+                    playSound(notesPlayed[index]);
+                    index++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 500);
+        }
+    </script>
+</body>
+</html>
